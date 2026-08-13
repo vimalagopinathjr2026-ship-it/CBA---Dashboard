@@ -1,442 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CBA Result Analysis & Teacher Remediation Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CBA Result Analysis Dashboard 2026-27</title>
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    :root {
-      --primary: #0f172a;
-      --secondary: #1e293b;
-      --accent: #2563eb;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text: #1e293b;
-      --border: #cbd5e1;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 1350px;
-      margin: 0 auto;
-    }
-
-    .header {
-      background: var(--primary);
-      color: white;
-      padding: 20px 25px;
-      border-radius: 10px;
-      margin-bottom: 25px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .header h1 {
-      margin: 0 0 5px 0;
-      font-size: 24px;
-    }
-
-    .header p {
-      margin: 0;
-      opacity: 0.8;
-      font-size: 14px;
-    }
-
-    .card {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      margin-bottom: 25px;
-      border: 1px solid var(--border);
-    }
-
-    .card h2 {
-      margin-top: 0;
-      color: var(--primary);
-      font-size: 18px;
-      border-bottom: 2px solid var(--bg);
-      padding-bottom: 10px;
-    }
-
-    textarea {
-      width: 100%;
-      height: 110px;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-family: monospace;
-      font-size: 12px;
+    * {
       box-sizing: border-box;
-      resize: vertical;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
-    .btn {
-      background-color: var(--accent);
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      font-size: 13px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 10px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    body {
+      background-color: #f4f7f6;
+      margin: 0;
+      padding: 20px;
+      color: #333;
     }
-
-    .btn:hover { opacity: 0.9; }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 15px;
+    .dashboard-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    h1 {
+      text-align: center;
+      color: #1a365d;
       margin-bottom: 25px;
     }
-
-    .summary-card {
-      padding: 18px;
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #2b6cb0;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 8px;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+    
+    /* Charts Grid */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .chart-card {
+      background: #fafafa;
+      border: 1fr solid #e2e8f0;
       border-radius: 8px;
-      border: 1px solid var(--border);
-      background: #ffffff;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
     }
 
-    .summary-card.green { border-left: 6px solid #16a34a; background: #f0fdf4; }
-    .summary-card.yellow { border-left: 6px solid #ca8a04; background: #fefce8; }
-    .summary-card.red { border-left: 6px solid #dc2626; background: #fef2f2; }
-
-    .summary-card h3 { margin: 0 0 5px 0; font-size: 16px; }
-    .summary-card .count { font-size: 28px; font-weight: bold; margin: 5px 0; }
-    .summary-card .details { font-size: 12px; color: #475569; }
-
-    .table-container {
-      overflow-x: auto;
+    /* Teacher Input Section */
+    .teacher-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
-
-    table {
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .input-group label {
+      font-weight: 600;
+      color: #2d3748;
+    }
+    .input-group textarea {
       width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      margin-top: 10px;
+      min-height: 100px;
+      padding: 12px;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      resize: vertical;
+      transition: border-color 0.2s;
     }
-
-    th, td {
-      border: 1px solid var(--border);
-      padding: 8px 10px;
-      text-align: left;
+    .input-group textarea:focus {
+      outline: none;
+      border-color: #3182ce;
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
     }
-
-    th {
-      background-color: var(--secondary);
-      color: white;
-    }
-
-    tr:nth-child(even) { background-color: #f8fafc; }
-
-    .badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-weight: bold;
-      font-size: 11px;
-    }
-
-    .badge-green { background: #dcfce7; color: #15803d; }
-    .badge-yellow { background: #fef9c3; color: #a16207; }
-    .badge-red { background: #fee2e2; color: #b91c1c; }
-
-    @media print {
-      .no-print { display: none; }
-      body { background: white; padding: 0; }
-      .card { box-shadow: none; border: 1px solid #ccc; }
+    
+    /* Responsive layout for mobile */
+    @media (max-width: 768px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="header">
-    <h1>CBA Result Analysis & Teacher Remediation Dashboard</h1>
-    <p>Social Science Item Analysis, Cognitive Breakdown & Actionable Remediation Plans (2026-27)</p>
-  </div>
+  <div class="dashboard-container">
+    <h1>CBA Result Analysis Dashboard 2026-27</h1>
 
-  <div class="card no-print">
-    <h2>1. Input Question Paper Dataset</h2>
-    <p style="font-size: 12px; color: #64748b; margin-bottom: 10px;">
-      Click <strong>Generate Complete Analysis</strong> to process Bloom's levels, options breakdown, and teacher worksheets:
-    </p>
-    <textarea id="tsvInput" placeholder="Paste TSV data here..."></textarea>
-    <div>
-      <button class="btn" onclick="processData()">⚡ Generate Complete Analysis</button>
-      <button class="btn" style="background-color: #059669;" onclick="downloadCSV()">📥 Download Full CSV</button>
-      <button class="btn" style="background-color: #475569;" onclick="window.print()">🖨️ Print / Save PDF</button>
+    <!-- Performance Charts Section -->
+    <div class="section-title">Performance Analytics</div>
+    <div class="charts-grid">
+      <!-- Bar Chart Card -->
+      <div class="chart-card">
+        <canvas id="barChart"></canvas>
+      </div>
+      <!-- Donut Chart Card -->
+      <div class="chart-card">
+        <canvas id="donutChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Teacher Specific Inputs Section -->
+    <div class="section-title">Teacher Remarks & Remediation</div>
+    <div class="teacher-inputs">
+      <div class="input-group">
+        <label for="misconceptions">Identified Misconception / Gap (Teacher Input):</label>
+        <textarea id="misconceptions" placeholder="Type identified student misconceptions or gaps here..."></textarea>
+      </div>
+
+      <div class="input-group">
+        <label for="remediation">Action & Remediation Plan (Teacher Input):</label>
+        <textarea id="remediation" placeholder="Detail the specific action steps and remediation plan here..."></textarea>
+      </div>
     </div>
   </div>
 
-  <div class="card">
-    <h2>2. Question Performance Summary by Category</h2>
-    <div class="summary-grid" id="categorySummaryCards"></div>
-  </div>
-
-  <div class="card">
-    <h2>3. Bloom's Taxonomy Cognitive Distribution</h2>
-    <div class="table-container" id="bloomsSummaryContainer"></div>
-  </div>
-
-  <div class="card">
-    <h2>4. Detailed Teacher Remediation & Distractor Analysis Table</h2>
-    <p style="font-size: 12px; color: #64748b; margin-bottom: 10px;">
-      Analyze student choices across incorrect options to pinpoint exact misconceptions and plan targeted remediation:
-    </p>
-    <div class="table-container" id="remediationTableContainer"></div>
-  </div>
-</div>
-
-<script>
-  const defaultTSV = `1\tWhy are political parties necessary for democracy?\tPolitical Parties ensure accountability for the nation and not only their constituencies\tConceptual\tUnderstand\t39\t54.90%\tDynastic succession – 14; Independent candidates – 6; Women participation – 12
-2\tIdentify an advantage of an alliance government.\tThere is more regional representation\tConceptual\tUnderstand\t30\t42.30%\tNot democratic in nature – 7; Monetary expenses – 12; Regional considerations and communal forces – 22
-3\tWinning the elections permits political parties to do which of the following?\tForming the Central or State governments\tKnowledge / Recall\tRemember\t44\t62.00%\tElecting Governor – 13; Election Commission – 10; Selecting Supreme Court judges – 4
-4\tConsider the following statements on political parties. Which of these is TRUE?\tR and S\tStatement-based\tAnalyse\t24\t33.80%\tP and Q – 8; Q and R – 26; S and P – 13
-5\tWhich of the following is NOT a way in which regional political parties strengthen democracy in India?\tBy strengthening the dominance of national political parties\tConceptual / Negative\tAnalyse\t25\t35.20%\tDiversity – 22; Grass-roots participation – 17; Safeguard minorities – 7
-6\tAn alliance government has difficulty in implementing any long-term schemes. Which of the following is NOT a reason for it?\tMaintaining an alliance government is expensive and hence budget is hampered for policy implementation\tReasoning-based\tAnalyse\t28\t39.40%\tNo majority – 25; Short-lived and unstable – 11; Clashing ideologies – 7
-7\tWhich of the following is a feature of a one-party system?\tOnly Q\tKnowledge / Recall\tRemember\t50\t70.40%\tOnly P – 3; Both P and Q – 15; Neither P nor Q – 3
-8\tAssertion (A): Political parties promote the interests of their voters. Reason (R): Political parties have been identified with social and political ideological divisions.\tBoth A and R are true but R does not explain A\tAssertion–Reason\tAnalyse\t20\t28.20%\tA true, R false – 5; A false, R true – 12; Both true and R explains A – 34
-9\tAssertion (A): Even in democratic countries the rich have more political power than the poor. Reason (R): Parties frequently take shortcuts like taking the support of corporations to win elections.\tBoth A and R are true and R explains A\tAssertion–Reason\tAnalyse\t45\t63.40%\tA true, R false – 4; A false, R true – 9; Both true but R doesn't explain A – 13
-10\tA bill is introduced and passed in both Houses within two days. The opposition, in a democracy, is important because…\tIt should scrutinise the bills proposed by the government and provide criticism\tCase / Situation-based\tAnalyse\t29\t40.80%\tAlternative government – 19; Speed/mobility – 12; Mould public opinion – 11
-11\tWhich of the following is DEFINITELY strengthening federalism in India?\tMultiple regional parties coming together to form a coalition government at the center\tConceptual\tAnalyse\t39\t54.90%\tTwo national parties – 9; Regional party in one state – 8; National party majority in states – 15
-12\tWhich of the following is a demerit of a bi-party system?\tRestricted choice for voters\tConceptual\tUnderstand\t41\t57.70%\tUnstable government – 18; Lack of accountability – 7; No continuation of policies – 5
-13\tWhich of the following issues will MOST LIKELY be dealt with by members of a regional party?\tDisaster management in a village\tApplication-based\tApply\t40\t56.30%\tMobile towers – 11; Highways/expressways – 13; Central universities – 7
-14\t_________ is a group of people who come together to contest elections and hold power in the government.\tPolitical party\tDefinition-based\tRemember\t63\t88.70%\tPressure group – 5; Interest group – 2; Business lobby – 1
-15\tPolitical parties reflect fundamental _______ in a society. Parties are about a part of society and thus involve PARTISANSHIP.\tPolitical divisions\tConceptual\tUnderstand\t20\t28.20%\tSocial divisions – 26; Economic divisions – 14; Religious divisions – 11
-16\tShyam desires to relocate to a new location where he can definitely produce large quantities of rice. Accordingly, which of the following should he search for?\tExtremely well-drained soil\tApplication-based\tApply\t24\t33.80%\tModerate rainfall – 33; Cold climate – 5; Dense forest – 9
-17\tGiven below is a map that shows regions where major crops are grown in India.\tNorthern Plains mostly grow food crops\tMap-based\tApply\t34\t47.90%\tSouthern India tea – 9; Fibre crops in cold regions – 9; Western India wheat – 19
-18\tRamu bought a patch of land that contains black soil. Which among the following crops can Ramu grow?\tCotton and sugarcane\tApplication-based\tApply\t43\t60.60%\tJute and tea – 9; Millets and coffee – 7; Rice and wheat – 12
-19\tWhy did the Government of India introduce a comprehensive land development program in the 1980s and 1990s?\tTo help farmers grow crops produced in countries where agriculture is subsidised\tConceptual / Reasoning\tUnderstand\t18\t25.40%\tBenefit few states – 43; Buy redistributed land – 5; Encourage organic farming – 5
-20\tThe primary goal of intensive farming is to maximise production and yield from a small piece of land. Which of the following would NOT be a feature of intensive farming?\tOrganic manure\tConceptual / Negative\tUnderstand\t38\t53.50%\tHYV seeds – 17; System irrigation – 7; Modern tools – 9
-21\tCoffee grows best in a tropical climate. Identify the region MOST SUITABLE for growing coffee.\tHot and humid southern peninsula\tApplication-based\tApply\t27\t38.00%\tCold northeastern hills – 17; High rainfed northern plains – 17; Hot and dry western desert – 10
-22\tAssertion (A): Primitive subsistence farming is dependent on modern tools and technologies. Reason (R): Farmers use tools like hoe, dao, and digging sticks.\tA is false, R is true\tAssertion–Reason\tAnalyse\t37\t52.10%\tBoth true and R explains A – 17; Both true but R doesn't explain A – 12; A true, R false – 5
-23\tAssertion (A): Rabi crops are sown in winter and harvested in summer. Reason (R): These crops require low temperatures for germination and grow well with winter precipitation.\tBoth A and R are true, and R explains A\tAssertion–Reason\tAnalyse\t48\t67.60%\tBoth true but R doesn't explain A – 10; A true, R false – 10; A false, R true – 3
-24\tAssertion (A): Millets like jowar and bajra can be grown in areas with less fertile soil and low rainfall. Reason (R): These crops are highly dependent on irrigation and HYV seeds.\tA is true, R is false\tAssertion–Reason\tAnalyse\t34\t47.90%\tBoth true and R explains A – 15; Both true but R doesn't explain A – 19; A false, R true – 3
-25\tAssertion (A): Green Revolution led to an increase in agricultural production in India. Reason (R): Green Revolution introduced HYV seeds and modern technology.\tBoth A and R are true, and R explains A\tAssertion–Reason\tAnalyse\t50\t70.40%\tBoth true but R doesn't explain A – 11; A true, R false – 8; A false, R true – 2
-26\tRearing of silkworms for the production of silk fibre is known as ______.\tSericulture\tDefinition-based\tRemember\t55\t77.50%\tViticulture – 5; Horticulture – 6; Agriculture – 5
-27\tWhich of the following is not correct about plantation farming?\tFarmers clear a patch of land by felling trees and burning them, to produce cereals and other food crops\tConceptual / Negative\tAnalyse\t37\t52.10%\tSingle crop on large area – 11; Agriculture-industry interface – 10; Estates – 13
-28\tKharif crops are grown:\tWith onset of monsoon and harvested in September–October\tKnowledge / Recall\tRemember\t48\t67.60%\tWinter and summer – 11; Autumn and summer – 9; None of the above – 3
-29\tA short season between the rabi and kharif season is known as:\tZaid\tKnowledge / Recall\tRemember\t56\t78.90%\tAus – 5; Boro – 6; None of the above – 4
-30\tThe two main wheat growing regions are:\tThe Ganga–Sutlej plains and the Deccan Trap\tMap / Geographical Application\tApply\t39\t54.90%\tNorth-eastern part and eastern-coastal plains – 21; Deccan plateau and Konkan coast – 8; None of the above – 3`;
-
-  document.getElementById('tsvInput').value = defaultTSV;
-
-  let globalParsedData = [];
-
-  function parseAccuracy(accStr) {
-    return parseFloat(accStr.replace('%', '')) || 0;
-  }
-
-  function getPerformanceCategory(acc) {
-    if (acc >= 65) return { label: 'Green Category (Better / High Score)', code: 'green', class: 'badge-green' };
-    if (acc >= 45) return { label: 'Yellow Category (Moderate)', code: 'yellow', class: 'badge-yellow' };
-    return { label: 'Red Category (Needs Remediation)', code: 'red', class: 'badge-red' };
-  }
-
-  function generateRemediationPlans(qNo, acc, dist) {
-    if (acc >= 65) {
-      return { misconception: "Concept mastered.", action: "No action required." };
-    }
-
-    const map = {
-      1: { misconception: "Students confused functional necessity of political parties with dynastic issues (14) or gender representation (12).", action: "Clarify core democracy roles: aggregate interests and hold power accountable." },
-      2: { misconception: "22 students selected 'regional considerations and communal forces' confusing a challenge with representation.", action: "Differentiate between regional representation (benefit) vs communal polarization (demerit)." },
-      3: { misconception: "13 students chose 'Electing Governor' and 10 chose 'Election Commission', confusing executive/constitutional roles.", action: "Conduct a civics role-sorting activity separating elected executive functions from appointed constitutional posts." },
-      4: { misconception: "26 students chose Q and R, failing to eliminate incorrect multi-statement choices.", action: "Practice elimination techniques for multi-statement multiple choice questions." },
-      5: { misconception: "22 students picked 'Diversity', overlooking the 'NOT' phrasing in the question.", action: "Highlight negative question phrasing ('NOT', 'INCORRECT') during quiz practice." },
-      6: { misconception: "25 students selected 'No majority' as NOT a reason, misunderstanding coalition instability mechanics.", action: "Map out flowcharts of coalition politics, policy compromises, and instability." },
-      8: { misconception: "34 students thought Reason explains Assertion, confusing logical link with parallel facts.", action: "Teach the 'Because Test' specifically for Assertion-Reason questions." },
-      9: { misconception: "13 students failed to link corporate contributions to disproportionate political power.", action: "Discuss money power in elections and campaign finance regulation concepts." },
-      10: { misconception: "19 students selected 'Alternative government' instead of legislative scrutiny.", action: "Emphasize the primary constitutional role of Opposition as bill scrutinizers." },
-      11: { misconception: "15 students selected national party dominance in states, confusing centralization with federalism.", action: "Reinforce federal principles: shared central power vs state-level autonomy." },
-      12: { misconception: "18 students selected 'Unstable government', confusing bi-party stability with multi-party coalitions.", action: "Compare Two-Party System (stability vs limited choice) and Multi-Party System." },
-      13: { misconception: "13 students selected national highways, confusing state/local jurisdictions with union lists.", action: "Review Constitutional Seventh Schedule (Union, State, Concurrent Lists)." },
-      15: { misconception: "26 students selected 'Social divisions', confusing general social divides with political partisanship.", action: "Define 'Partisanship' directly from NCERT text: strong allegiance to a political party." },
-      16: { misconception: "33 students selected 'Moderate rainfall', failing to recall high water requirements for rice.", action: "Chart crop climatic profiles (Temperature, Rainfall, Soil) side-by-side." },
-      17: { misconception: "19 students selected Western India for wheat, confusing primary cropping belts on map.", action: "Conduct map-pointing drills for major food grain producing regions in India." },
-      18: { misconception: "12 students selected rice/wheat for black soil, overlooking cotton/sugarcane suitability.", action: "Match soil types (Regur/Black) directly with cash crops (Cotton, Sugarcane)." },
-      19: { misconception: "43 students mistakenly selected 'Benefit few states', confusing program goals with regional disparities.", action: "Revisit 1980s/90s institutional land reforms and market integration policies." },
-      20: { misconception: "17 students chose HYV seeds, forgetting organic manure is associated with primitive/organic farming.", action: "Contrast Intensive Farming features (high inputs, HYV, irrigation) with organic inputs." },
-      21: { misconception: "17 selected cold northeastern hills and 17 selected northern plains, misjudging coffee zones.", action: "Map plantation crops: Coffee in Nilgiri/Southern Hills; Tea in Assam/Darjeeling." },
-      22: { misconception: "17 students marked Primitive Subsistence as dependent on modern tech despite manual tools listed.", action: "Clarify 'Primitive' tools (hoe, dao, digging stick) vs modern tech (tractors, HYV)." },
-      24: { misconception: "19 students thought R was true, misattributing HYV/irrigation dependence to millets.", action: "Explain drought-resistance features of coarse grains/millets (Jowar, Bajra, Ragi)." },
-      27: { misconception: "13 students selected 'Estates', failing to recognize 'slash and burn' belongs to primitive subsistence.", action: "Differentiate commercial plantation features from slash-and-burn (Shifting) farming." },
-      30: { misconception: "21 students selected NE and eastern-coastal plains, misplacing primary wheat zones.", action: "Re-anchor wheat geography: Ganga-Sutlej Plains and Deccan Trap black soil belt." }
-    };
-
-    return map[qNo] || {
-      misconception: "Students exhibited partial conceptual gap based on option choices.",
-      action: "Review question in class with step-by-step option breakdown."
-    };
-  }
-
-  function processData() {
-    const raw = document.getElementById('tsvInput').value.trim();
-    if (!raw) return;
-
-    const lines = raw.split('\n');
-    globalParsedData = [];
-
-    lines.forEach(line => {
-      const cols = line.split('\t');
-      if (cols.length >= 8) {
-        const qNum = parseInt(cols[0].trim());
-        const acc = parseAccuracy(cols[6].trim());
-        const cat = getPerformanceCategory(acc);
-        const rem = generateRemediationPlans(qNum, acc, cols[7].trim());
-
-        globalParsedData.push({
-          qNo: qNum,
-          question: cols[1].trim(),
-          answerKey: cols[2].trim(),
-          type: cols[3].trim(),
-          bloom: cols[4].trim(),
-          correct: cols[5].trim(),
-          accuracy: acc,
-          distractors: cols[7].trim(),
-          category: cat,
-          misconception: rem.misconception,
-          action: rem.action
-        });
+  <script>
+    // Initialize Bar Diagram
+    const ctxBar = document.getElementById('barChart').getContext('2d');
+    new Chart(ctxBar, {
+      type: 'bar',
+      data: {
+        labels: ['Topic 1', 'Topic 2', 'Topic 3', 'Topic 4', 'Topic 5'],
+        datasets: [{
+          label: 'Average Score (%)',
+          data: [72, 58, 85, 44, 69],
+          backgroundColor: '#3182ce',
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Topic Performance Analysis (Bar Diagram)',
+            font: { size: 14 }
+          },
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100
+          }
+        }
       }
     });
 
-    renderSummaryCards();
-    renderBloomsSummary();
-    renderRemediationTable();
-  }
-
-  function renderSummaryCards() {
-    const greenList = globalParsedData.filter(q => q.category.code === 'green').map(q => `Q${q.qNo}`);
-    const yellowList = globalParsedData.filter(q => q.category.code === 'yellow').map(q => `Q${q.qNo}`);
-    const redList = globalParsedData.filter(q => q.category.code === 'red').map(q => `Q${q.qNo}`);
-
-    const html = `
-      <div class="summary-card green">
-        <h3>🟢 Green Category (Better / High Score)</h3>
-        <div class="count">${greenList.length}</div>
-        <div class="details">Threshold: ≥ 65% Accuracy</div>
-        <div class="details" style="margin-top: 5px;"><strong>Questions:</strong> ${greenList.join(', ') || 'None'}</div>
-      </div>
-      <div class="summary-card yellow">
-        <h3>🟡 Yellow Category (Moderate)</h3>
-        <div class="count">${yellowList.length}</div>
-        <div class="details">Threshold: 45% - 64% Accuracy</div>
-        <div class="details" style="margin-top: 5px;"><strong>Questions:</strong> ${yellowList.join(', ') || 'None'}</div>
-      </div>
-      <div class="summary-card red">
-        <h3>🔴 Red Category (Needs Remediation)</h3>
-        <div class="count">${redList.length}</div>
-        <div class="details">Threshold: &lt; 45% Accuracy</div>
-        <div class="details" style="margin-top: 5px;"><strong>Questions:</strong> ${redList.join(', ') || 'None'}</div>
-      </div>
-    `;
-
-    document.getElementById('categorySummaryCards').innerHTML = html;
-  }
-
-  function renderBloomsSummary() {
-    const levels = ['Remember', 'Understand', 'Apply', 'Analyse'];
-    const totalQ = globalParsedData.length || 1;
-
-    let html = `<table>
-      <thead>
-        <tr>
-          <th>Bloom's Cognitive Level</th>
-          <th style="text-align: center;">No. of Questions</th>
-          <th style="text-align: center;">Paper Weightage (%)</th>
-          <th style="text-align: center;">Student Average Accuracy (%)</th>
-        </tr>
-      </thead>
-      <tbody>`;
-
-    levels.forEach(lvl => {
-      const filtered = globalParsedData.filter(q => q.bloom.toLowerCase() === lvl.toLowerCase());
-      const count = filtered.length;
-      const weightage = ((count / totalQ) * 100).toFixed(1);
-      const avgAcc = count > 0 
-        ? (filtered.reduce((sum, q) => sum + q.accuracy, 0) / count).toFixed(2)
-        : '0.00';
-
-      html += `<tr>
-        <td><strong>${lvl}</strong></td>
-        <td style="text-align: center;">${count}</td>
-        <td style="text-align: center;">${weightage}%</td>
-        <td style="text-align: center; font-weight: bold;">${avgAcc}%</td>
-      </tr>`;
+    // Initialize Donut Chart
+    const ctxDonut = document.getElementById('donutChart').getContext('2d');
+    new Chart(ctxDonut, {
+      type: 'doughnut',
+      data: {
+        labels: ['Proficient', 'Developing', 'Needs Attention'],
+        datasets: [{
+          data: [55, 30, 15],
+          backgroundColor: ['#38a169', '#ecc94b', '#e53e3e'],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Student Grade Distribution (Donut Chart)',
+            font: { size: 14 }
+          }
+        }
+      }
     });
 
-    html += `</tbody></table>`;
-    document.getElementById('bloomsSummaryContainer').innerHTML = html;
-  }
+    // Optional: Persist Teacher Inputs in LocalStorage so entries aren't lost on refresh
+    const misconceptionsInput = document.getElementById('misconceptions');
+    const remediationInput = document.getElementById('remediation');
 
-  function renderRemediationTable() {
-    let html = `<table>
-      <thead>
-        <tr>
-          <th style="width: 45px;">Q.No</th>
-          <th>Question Text</th>
-          <th>1. Correct Answer Key</th>
-          <th>2. Other Options Selected (Counts)</th>
-          <th style="width: 75px;">Bloom Level</th>
-          <th style="width: 65px; text-align: center;">Accuracy</th>
-          <th style="width: 120px;">Category</th>
-          <th>Identified Misconception / Gap</th>
-          <th>Action & Remediation Plan</th>
-        </tr>
-      </thead>
-      <tbody>`;
+    // Load saved values
+    misconceptionsInput.value = localStorage.getItem('cba_misconceptions') || '';
+    remediationInput.value = localStorage.getItem('cba_remediation') || '';
 
-    globalParsedData.forEach(q => {
-      const distBullets = q.distractors.split(';').map(d => `• ${d.trim()}`).join('<br>');
-
-      html += `<tr>
-        <td><strong>Q${q.qNo}</strong></td>
-        <td>${q.question}</td>
-        <td><strong style="color: #15803d;">${q.answerKey}</strong></td>
-        <td style="font-size: 11px; color: #334155;">${distBullets}</td>
-        <td><strong>${q.bloom}</strong></td>
-        <td style="text-align: center; font-weight: bold;">${q.accuracy.toFixed(1)}%</td>
-        <td><span class="badge ${q.category.class}">${q.category.code.toUpperCase()}</span></td>
-        <td style="font-size: 11px;">${q.misconception}</td>
-        <td style="font-size: 11px;">${q.action}</td>
-      </tr>`;
+    // Save values on typing
+    misconceptionsInput.addEventListener('input', (e) => {
+      localStorage.setItem('cba_misconceptions', e.target.value);
     });
-
-    html += `</tbody></table>`;
-    document.getElementById('remediationTableContainer').innerHTML = html;
-  }
-
-  function downloadCSV() {
-    let csv = 'Q.No,Question,Answer Key,Bloom Level,Accuracy,Category,Misconception,Remediation Plan\n';
-    globalParsedData.forEach(q => {
-      csv += `"${q.qNo}","${q.question.replace(/"/g, '""')}","${q.answerKey.replace(/"/g, '""')}","${q.bloom}","${q.accuracy}%","${q.category.code}","${q.misconception.replace(/"/g, '""')}","${q.action.replace(/"/g, '""')}"\n`;
+    remediationInput.addEventListener('input', (e) => {
+      localStorage.setItem('cba_remediation', e.target.value);
     });
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'CBA_Remediation_Analysis_Report.csv';
-    a.click();
-  }
-
-  window.onload = function() {
-    processData();
-  };
-</script>
+  </script>
 
 </body>
 </html>
